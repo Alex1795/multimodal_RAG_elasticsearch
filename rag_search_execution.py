@@ -3,8 +3,8 @@ from elasticsearch import Elasticsearch
 from clip_processor import create_text_embedding
 
 
-cloud_id = "My_deployment:ZWFzdHVzMi5henVyZS5lbGFzdGljLWNsb3VkLmNvbTo0NDMkODRiMjE3MTA0OWQzNDIzMWIyOTRhNTBhZTk3MTZlODUkZTk3N2RmMTI5NDYyNGJjMjk5NGM2OGE2NmMwOTM0NWI="
-api_key = "MlZYdGxaY0I4U01oMkdCSkZOXzg6QUprNXZZLWhvaGV6MTAxZVlkUHB3UQ=="
+cloud_id = "<your_es_cloud_id>"
+api_key = "<your_es_api_key>"
 index = "mmrag_blog"
 
 
