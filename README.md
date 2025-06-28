@@ -2,6 +2,8 @@
 
 This project was created for a blog for Elasticsearch. It takes the implementation of a multimodal RAG system to build an assistant that recommends activities in national parks based on a RAG search against Elasticsearch. 
 
+Blog link: <TO DO>
+
 The project covers all the parts needed to create the data, index it on Elastic and run a front end to search and interact with the assistant.
 
 ## System architecture
