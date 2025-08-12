@@ -23,11 +23,11 @@ def upload_document(es: Elasticsearch, doc, index):
 
 
 def index_logic():
-    cloud_id = "<your_es_cloud_id>"
+    host = "<your_es_host>"
     api_key = "<your_es_api_key>"
     index = "mmrag_blog"
 
-    es = Elasticsearch(cloud_id=cloud_id, api_key=api_key)
+    es = Elasticsearch(hosts=host, api_key=api_key)
 
     metadata_files = list_metadata_files('images_metadata/')
 

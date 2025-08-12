@@ -3,7 +3,7 @@ from elasticsearch import Elasticsearch
 from clip_processor import create_text_embedding
 
 
-cloud_id = "<your_es_cloud_id>"
+host = "<your_es_host>"
 api_key = "<your_es_api_key>"
 index = "mmrag_blog"
 
@@ -86,7 +86,7 @@ def rrf_search(index_name, lat, lon, distance, text_query, k=10,
 
     #print(s.to_dict())
 
-    es = Elasticsearch(cloud_id=cloud_id, api_key=api_key)
+    es = Elasticsearch(hosts=host, api_key=api_key)
 
     results = s.using(es).execute()["hits"]["hits"]
 
@@ -130,11 +130,6 @@ if __name__ == "__main__":
         text_query=search_text
     )
 
-    # es = Elasticsearch(cloud_id=cloud_id, api_key=api_key)
-    #
-    # results = search_with_index.using(es).execute()["hits"]["hits"]
-
-    #print(results)
     for result in results:
         print(result['_score'])
         result = result["_source"]
