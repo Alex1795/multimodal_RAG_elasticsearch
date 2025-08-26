@@ -4,6 +4,9 @@ import json
 from typing import Dict, List, Any, Optional
 from rag_search_execution import *
 
+
+index = os.getenv('ES_INDEX')
+
 national_parks = {
     "mt_rainier_national_park": {
         "coordinates": (46.8523, -121.7603),
@@ -106,9 +109,9 @@ User query: {query}
     return None
 
 
-def search_parks_elasticsearch(search_params: Dict[str, Any], rrf_search) -> List[Dict[str, Any]]:
+def search_parks_elasticsearch(search_params: Dict[str, Any], host, api_key) -> List[Dict[str, Any]]:
     """Execute Elasticsearch searches for relevant parks"""
-    index_name = "mmrag_blog"
+    index_name = os.getenv('ES_INDEX')
 
     # Get relevant parks or use all parks if none specified
     relevant_parks = search_params.get('relevant_parks', [])
@@ -131,6 +134,8 @@ def search_parks_elasticsearch(search_params: Dict[str, Any], rrf_search) -> Lis
         try:
             # Execute the search for this park
             search_results = rrf_search(
+                host=host,
+                api_key=api_key,
                 index_name=index_name,
                 lat=latitude,
                 lon=longitude,
@@ -168,14 +173,11 @@ def generate_response(original_query: str, search_results: List[Dict[str, Any]],
     else:
         results_text = "Search Results:\n"
         for result in search_results:
-            #park_name = result.get('image_filename', '').replace('_', ' ').title()
-           # print(result, type(result))
             score = result['_score']
             # Adjust these field names based on your Elasticsearch document structure
             title = result['image_filename']
             content_snippet = result['generated_description'][:200] + "..."
 
-           #results_text += f"\n{i}. Park: {park_name}\n"
             results_text += f"   Title: {title}\n"
             results_text += f"   Content: {content_snippet}\n"
             results_text += f"   Relevance Score: {score}\n"
@@ -220,7 +222,7 @@ Response:"""
     return "I wasn't able to generate a proper response. Please try rephrasing your question."
 
 
-def process_parks_query(user_query: str, rrf_search) -> str:
+def process_parks_query(user_query: str, host, api_key) -> str:
     """Main function to process a user query end-to-end"""
     print(f"Processing query: {user_query}")
 
@@ -232,43 +234,10 @@ def process_parks_query(user_query: str, rrf_search) -> str:
     print(f"Extracted parameters: {search_params}")
 
     # Step 2: Execute searches across relevant parks
-    search_results = search_parks_elasticsearch(search_params, rrf_search)
+    search_results = search_parks_elasticsearch(search_params, host, api_key)
 
     # Step 3: Generate final response
     final_response = generate_response(user_query, search_results, search_params)
 
     return final_response, search_results
 
-
-# Example usage
-if __name__ == "__main__":
-    # You'll need to import or define your create_rrf_search_from_index function here
-    # from your_elasticsearch_module import create_rrf_search_from_index
-
-    # Mock function for testing (replace with actual function)
-    # def mock_search_function(index_name, lat, lon, distance, text_query):
-    #     return [
-    #         {
-    #             '_score': 0.95,
-    #             '_source': {
-    #                 'title': 'Dog-friendly Trail',
-    #                 'content': 'A beautiful trail perfect for walking dogs with scenic views...'
-    #             }
-    #         }
-    #     ]
-
-
-    # Test queries
-    test_queries = [
-        "Best hiking trails in Utah national parks",
-        "Camping spots in Wyoming mountains",
-        "hike in utah"
-    ]
-
-    for query in test_queries:
-        print(f"\n{'=' * 60}")
-        response, search_results = process_parks_query(query, rrf_search)
-        print(f"Query: {query}")
-        print(f"Response: {response}")
-        print("Search results:",search_results)
-        print('=' * 60)

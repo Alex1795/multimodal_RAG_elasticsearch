@@ -23,9 +23,9 @@ def upload_document(es: Elasticsearch, doc, index):
 
 
 def index_logic():
-    host = "<your_es_host>"
-    api_key = "<your_es_api_key>"
-    index = "mmrag_blog"
+    host = os.getenv('ES_HOST')
+    api_key = os.getenv('ES_API_KEY')
+    index = os.getenv('ES_INDEX')
 
     es = Elasticsearch(hosts=host, api_key=api_key)
 

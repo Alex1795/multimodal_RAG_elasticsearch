@@ -5,3 +5,5 @@ torchvision~=0.22.1
 transformers~=4.52.4
 ollama~=0.5.1
 elasticsearch~=8.18.1
+elasticsearch-dsl
+dotenv

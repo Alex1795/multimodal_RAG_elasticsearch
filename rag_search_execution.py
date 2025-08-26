@@ -1,20 +1,13 @@
 from elasticsearch_dsl import Search, Q
 from elasticsearch import Elasticsearch
 from clip_processor import create_text_embedding
+import os
 
 
-host = "<your_es_host>"
-api_key = "<your_es_api_key>"
-index = "mmrag_blog"
+index = os.getenv('ES_INDEX')
 
 
-query = "car"
-
-query_embedding = create_text_embedding(query).tolist()
-
-
-
-def rrf_search(index_name, lat, lon, distance, text_query, k=10,
+def rrf_search(host, api_key, index_name, lat, lon, distance, text_query, k=10,
                num_candidates=100):
     """
     Create an RRF search object bound to a specific index.
@@ -84,8 +77,6 @@ def rrf_search(index_name, lat, lon, distance, text_query, k=10,
     # Apply RRF configuration
     s = s.extra(retriever={'rrf': {'retrievers': retrievers}}, size=3)
 
-    #print(s.to_dict())
-
     es = Elasticsearch(hosts=host, api_key=api_key)
 
     results = s.using(es).execute()["hits"]["hits"]
@@ -108,32 +99,3 @@ def execute_rrf_search_dsl(es_client, search_obj):
     response = search_obj.using(es_client).execute()
     return response
 
-
-# Example usage:
-if __name__ == "__main__":
-    # Example parameters
-
-
-    latitude = 40.73
-    longitude = -74.1
-    search_distance = 100000000000
-    search_text = "places where I can ride a bike"
-    index_name = index
-
-
-    # Method 2: Create search bound to index
-    results = rrf_search(
-        index_name=index_name,
-        lat=latitude,
-        lon=longitude,
-        distance=search_distance,
-        text_query=search_text
-    )
-
-    for result in results:
-        print(result['_score'])
-        result = result["_source"]
-        print(result['image_filename'])
-        print(result["generated_description"])
-
-        print('-' * 50)

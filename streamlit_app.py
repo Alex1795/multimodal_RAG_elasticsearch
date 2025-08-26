@@ -2,12 +2,11 @@ import streamlit as st
 import os
 from PIL import Image
 from typing import List, Dict, Any
-
-# Import your functions (adjust the import path as needed)
-# from your_parks_module import process_parks_query
-# from your_elasticsearch_module import create_rrf_search_from_index
 from LLM_conversation import process_parks_query
-from rag_search_execution import rrf_search
+from dotenv import load_dotenv
+
+
+
 
 # Page configuration
 st.set_page_config(
@@ -82,18 +81,13 @@ def display_search_results(search_results: List[Dict[str, Any]]):
 
     st.subheader("🏞️ Recommended Locations")
 
-    #print(search_results)
 
     # Group results by park_id to avoid duplicates
     park_results = {}
-    print(search_results)
     for result in search_results:
         park_id = result['park_id']
         if park_id not in park_results:
             park_results[park_id] = result
-
-    # Convert to list for easier handling
-    unique_results = list(park_results.values())
 
     # Display in rows of 3
     for i in range(0, len(search_results), 3):
@@ -102,7 +96,6 @@ def display_search_results(search_results: List[Dict[str, Any]]):
         for j, col in enumerate(cols):
             if i + j < len(search_results):
                 result = search_results[i + j]
-                #print(result["generated_description"])
 
                 with col:
                     # Get data from result
@@ -131,6 +124,10 @@ def display_search_results(search_results: List[Dict[str, Any]]):
 
 
 def main():
+    load_dotenv()
+    host = os.getenv('ES_HOST')
+    api_key = os.getenv('ES_API_KEY')
+    index = os.getenv('ES_INDEX')
     # App header
     st.title("🏔️ National Parks Activity Finder")
     st.markdown("Discover amazing activities and locations in America's National Parks!")
@@ -169,9 +166,8 @@ def main():
     if search_button and query.strip():
         with st.spinner("Searching national parks..."):
             try:
-                # Replace this with your actual function call
-                response, search_results = process_parks_query(query, rrf_search)
-                #response, search_results = mock_process_parks_query(query, None)
+
+                response, search_results = process_parks_query(query, host, api_key)
 
                 st.session_state.llm_response = response
                 st.session_state.search_results = search_results
@@ -188,8 +184,8 @@ def main():
     if st.session_state.llm_response:
         st.markdown("### 🤖 AI Assistant Response")
         st.markdown(f"""
-        <div class="response-box">
-            {st.session_state.llm_response}
+        <div style="background-color: #f8f9fa; color: #212529; padding: 20px; border-radius: 10px; border: 1px solid #dee2e6; margin: 10px 0;">
+        {st.session_state.llm_response}
         </div>
         """, unsafe_allow_html=True)
 
